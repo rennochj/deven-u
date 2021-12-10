@@ -1,0 +1,5 @@
+[user]
+	name = connerjh
+	email = c_rennochj@outlook.com
+[credential]
+	helper = "!f() { /home/vscode/.vscode-server/bin/7db1a2b88f7557e0a43fec75b6ba7e50b3e9f77e/node /tmp/vscode-remote-containers-78309d17def72439ffb826a8941871db454e722b.js $*; }; f"

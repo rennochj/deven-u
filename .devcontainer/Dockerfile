@@ -1,4 +1,4 @@
-FROM cgregistry.capgroup.com/ubuntu:focal
+FROM ubuntu:focal
 LABEL org.opencontainers.image.source https://github.com/open-itg/deven-u
  
 ENV TZ=America/Los_Angeles
@@ -8,8 +8,8 @@ ENV TZ=America/Los_Angeles
 RUN apt-get update && \
     apt-get -y install ca-certificates
  
-RUN echo 'deb [trusted=yes] https://cgrepo.capgroup.com/repository/apt-proxy/ focal main restricted universe multiverse' > /etc/apt/sources.list
-RUN echo 'deb [trusted=yes] https://cgrepo.capgroup.com/repository/apt-proxy/ focal-updates main restricted universe multiverse' >> /etc/apt/sources.list
+# RUN echo 'deb [trusted=yes] https://cgrepo.capgroup.com/repository/apt-proxy/ focal main restricted universe multiverse' > /etc/apt/sources.list
+# RUN echo 'deb [trusted=yes] https://cgrepo.capgroup.com/repository/apt-proxy/ focal-updates main restricted universe multiverse' >> /etc/apt/sources.list
  
 RUN apt-get clean && apt-get update
 RUN apt-get -y install ca-certificates
@@ -22,7 +22,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt -y install wget curl zsh unzip vim snap
 # Install Git ---------------------------------------------------------------------------------------------------------
  
 RUN apt -y install git
-RUN git config --global http.sslCAInfo /cacert.pem
+# RUN git config --global http.sslCAInfo /cacert.pem
  
 # Install Docker ------------------------------------------------------------------------------------------------------
  
@@ -34,14 +34,14 @@ RUN ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 # Install Python ------------------------------------------------------------------------------------------------------
  
 RUN DEBIAN_FRONTEND=noninteractive apt -y install python3.8 python3-pip
-RUN pip config --user set global.index https://cgrepo.capgroup.com/repository/cgpypi/pypi
-RUN pip config --user set global.index-url https://cgrepo.capgroup.com/repository/cgpypi/simple
-RUN pip config --user set global.trusted-host cgrepo.capgroup.com
+# RUN pip config --user set global.index https://cgrepo.capgroup.com/repository/cgpypi/pypi
+# RUN pip config --user set global.index-url https://cgrepo.capgroup.com/repository/cgpypi/simple
+# RUN pip config --user set global.trusted-host cgrepo.capgroup.com
  
 # Install NodeJS ------------------------------------------------------------------------------------------------------
  
 RUN DEBIAN_FRONTEND=noninteractive apt -y install nodejs yarn npm
-RUN npm config set registry https://cgrepo.capgroup.com/repository/cgnpm/   
+# RUN npm config set registry https://cgrepo.capgroup.com/repository/cgnpm/   
  
 # Install awscli v2 ---------------------------------------------------------------------------------------------------
  
@@ -66,24 +66,28 @@ RUN groupadd --gid 1000 vscode \
     && echo vscode ALL=\(root\) NOPASSWD:ALL >> /etc/sudoers \
     && chmod 0440 /etc/sudoers
  
-RUN chown -R vscode /cacert.pem
+# RUN chown -R vscode /cacert.pem
 RUN usermod -a -G docker vscode
-ADD --chown=vscode:vscode dotfiles/* /home/vscode/
-ADD --chown=vscode:vscode cg-scripts/* /usr/local/bin/
- 
-RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git /home/vscode/powerlevel10k
- 
+
 # Setup vscode user --------------------------------------------------------------------------------------------------
  
 USER vscode
- 
+
 SHELL ["/usr/bin/zsh", "-c"]
 ENV SHELL /usr/bin/zsh
-RUN git config --global http.sslCAInfo /cacert.pem
+ENV ZSH_THEME "powerlevel10k/powerlevel10k"
+# RUN git config --global http.sslCAInfo /cacert.pem
  
+RUN sh -c "$(wget https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)"
+RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git /home/vscode/powerlevel10k
+RUN chown -R vscode:vscode /home/vscode/powerlevel10k
+ 
+ADD --chown=vscode:vscode dotfiles/* /home/vscode/
+ADD --chown=vscode:vscode scripts/* /usr/local/bin/
+
 RUN wget -O - https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh | bash
 RUN source ~/.zshrc && nvm install 16.10.0
- 
+
 CMD [ "sleep", "infinity"]
  
  
