@@ -1,7 +1,7 @@
 # deven-ubuntu
 
 - [ ] One
-- [ ] Two
+- [x] Two
 - [ ] Three
 
 - [x] Write the press release
